@@ -1,121 +1,123 @@
-# STM32F405 Bootloader CLI Tool
+# Bootloader CLI Tool
 
-A command-line interface tool for flashing and managing firmware on STM32F405 devices through USB or UART interfaces. This tool supports secure firmware updates with AES encryption and ECDH key exchange.
+A command-line interface tool for bootloader operations, supporting both USB and UART interfaces.
+
+## Project Structure
+
+```
+BL_CLI/
+├── BL_CLI/
+│   ├── __init__.py
+│   ├── __main__.py
+│   ├── cli.py          # Command-line interface
+│   ├── uart_handler.py # UART-specific functionality
+│   ├── usb_handler.py  # USB-specific functionality
+│   └── utils.py        # Common utilities and constants
+├── setup.py           # Package installation
+├── README.md         # Package documentation
+└── .gitignore       # Git ignore file
+```
 
 ## Features
 
-- Dual interface support (USB/UART)
-- Secure firmware updates using AES-CBC encryption
-- ECDH key exchange for secure communication
-- Intel HEX file support
-- Firmware image creation with versioning
-- Device UID verification
+- Create encrypted bootloader images
+- Flash images via USB or UART
+- Support for AES encryption
+- Progress bar for flashing operations
+- Verbose mode for debugging
 
-## Prerequisites
+## Installation
 
+1. Clone the repository:
 ```bash
-pip install -r requirements.txt
+git clone <repository-url>
+cd BL_CLI
 ```
 
-## Commands
-
-### 1. Flash Command
-
-Flash a firmware image to the device using either USB or UART interface.
-
-#### USB Interface
+2. Install the package:
 ```bash
-python BL_CLI.py flash --interface usb \
-                      --product-id <PID> \
-                      --vendor-id <VID> \
-                      --address <FLASH_ADDR> \
-                      --path <HEX_FILE> \
-                      [--verbose]
+pip install -e .
 ```
 
-Example:
+## Usage
+
+The tool provides three main commands:
+
+### Version
+
+Display the version of the tool:
 ```bash
-python BL_CLI.py flash -i usb -pid 0483 -vid 5740 -a 0x08020000 -p firmware.hex -v
+bl-cli version
 ```
 
-#### UART Interface
+### Create Image
+
+Create an encrypted bootloader image:
 ```bash
-python BL_CLI.py flash --interface uart \
-                      --port <SERIAL_PORT> \
-                      --address <FLASH_ADDR> \
-                      --path <HEX_FILE> \
-                      [--verbose]
+bl-cli image -i <input-hex-file> -o <output-file> [options]
 ```
 
-Example:
+Options:
+- `-i, --input`: Input hex file path (required)
+- `-o, --output`: Output file path (required)
+- `-k, --aes-key`: AES key for encryption (optional)
+- `-iv, --aes-iv`: AES initialization vector (optional)
+- `-g, --magic-number`: Magic number for image identification (optional)
+- `-M, --major-version`: Major version number (optional)
+- `-m, --minor-version`: Minor version number (optional)
+- `-p, --patch-version`: Patch version number (optional)
+- `-v, --verbose`: Enable verbose output
+
+### Flash Image
+
+Flash an image to a device:
 ```bash
-python BL_CLI.py flash -i uart -P /dev/ttyUSB0 -a 0x08020000 -p firmware.hex -v
+bl-cli flash -i <interface> -p <image-path> -a <address> [options]
 ```
 
-### 2. Image Command
+Options:
+- `-i, --interface`: Interface to use ('usb' or 'uart') (required)
+- `-p, --path`: Path to the image file (required)
+- `-a, --address`: Flash address in hex (required)
+- `-pid, --product-id`: USB product ID (required for USB)
+- `-vid, --vendor-id`: USB vendor ID (required for USB)
+- `-P, --port`: UART port (required for UART)
+- `-v, --verbose`: Enable verbose output
 
-Create an encrypted firmware image with version information.
+## Examples
 
+1. Create an encrypted image:
 ```bash
-python BL_CLI.py image --input <INPUT_HEX> \
-                      --output <OUTPUT_FILE> \
-                      [--aes-key <KEY>] \
-                      [--aes-iv <IV>] \
-                      [--magic-number <NUM>] \
-                      [--major-version <VER>] \
-                      [--minor-version <VER>] \
-                      [--patch-version <VER>] \
-                      [--verbose]
+bl-cli image -i firmware.hex -o firmware.bin -k 000102030405060708090a0b0c0d0e0f -iv 000102030405060708090a0b0c0d0e0f -v
 ```
 
-Example:
+2. Flash via USB:
 ```bash
-python BL_CLI.py image -i input.hex -o firmware.bin -M 1 -m 0 -p 0 -v
+bl-cli flash -i usb -p firmware.hex -a 0x08000000 -pid 0x0483 -vid 0x5740 -v
 ```
 
-### 3. Version Command
-
-Display the version of the CLI tool.
-
+3. Flash via UART:
 ```bash
-python BL_CLI.py version
+bl-cli flash -i uart -p firmware.hex -a 0x08000000 -P /dev/ttyUSB0 -v
 ```
 
-## Parameters
+## Dependencies
 
-### Flash Command
-- `--interface, -i`: Interface type (usb/uart)
-- `--product-id, -pid`: USB product ID in hex (required for USB)
-- `--vendor-id, -vid`: USB vendor ID in hex (required for USB)
-- `--port, -P`: Serial port (required for UART)
-- `--address, -a`: Flash address in hex (required)
-- `--path, -p`: Path to the hex file (required)
-- `--verbose, -v`: Enable verbose output
+- click
+- pycryptodome
+- pyusb
+- pyserial
+- cryptography
 
-### Image Command
-- `--input, -i`: Input hex file path
-- `--output, -o`: Output binary file path
-- `--aes-key, -k`: AES key (default: 000102030405060708090a0b0c0d0e0f)
-- `--aes-iv, -iv`: AES IV (default: 000102030405060708090a0b0c0d0e0f)
-- `--magic-number, -g`: Magic number (default: 0x01234567)
-- `--major-version, -M`: Major version (default: 1)
-- `--minor-version, -m`: Minor version (default: 0)
-- `--patch-version, -p`: Patch version (default: 0)
-- `--verbose, -v`: Enable verbose output
+## Development
 
-## Error Handling
+For development, you can install the package in editable mode:
+```bash
+pip install -e .
+```
 
-The tool includes comprehensive error handling for:
-- Invalid parameters
-- Connection failures
-- Communication errors
-- Flashing errors
-- File format errors
+This allows you to modify the code and test changes without reinstalling.
 
-## Security Features
+## License
 
-- AES-CBC encryption for all communications
-- ECDH key exchange using SECP256R1 curve
-- Unique session keys per connection
-- Device UID verification
-- CRC32 packet validation 
+This project is licensed under the MIT License. 

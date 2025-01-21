@@ -1,2 +1,28 @@
-venv/*
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+BL_CLI.egg-info/
+
+# Virtual environments
+venv/
+env/
+.env/
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Operating System
+.DS_Store
+Thumbs.db 
+
 *.hex
