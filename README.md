@@ -2,22 +2,6 @@
 
 A command-line interface tool for bootloader operations, supporting both USB and UART interfaces.
 
-## Project Structure
-
-```
-BL_CLI/
-├── BL_CLI/
-│   ├── __init__.py
-│   ├── __main__.py
-│   ├── cli.py          # Command-line interface
-│   ├── uart_handler.py # UART-specific functionality
-│   ├── usb_handler.py  # USB-specific functionality
-│   └── utils.py        # Common utilities and constants
-├── setup.py           # Package installation
-├── README.md         # Package documentation
-└── .gitignore       # Git ignore file
-```
-
 ## Features
 
 - Create encrypted bootloader images
@@ -26,18 +10,6 @@ BL_CLI/
 - Progress bar for flashing operations
 - Verbose mode for debugging
 
-## Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd BL_CLI
-```
-
-2. Install the package:
-```bash
-pip install -e .
-```
 
 ## Usage
 
@@ -47,14 +19,14 @@ The tool provides three main commands:
 
 Display the version of the tool:
 ```bash
-bl-cli version
+python3 BL_CLI version
 ```
 
 ### Create Image
 
 Create an encrypted bootloader image:
 ```bash
-bl-cli image -i <input-hex-file> -o <output-file> [options]
+python3 BL_CLI image -i <input-hex-file> -o <output-file> [options]
 ```
 
 Options:
@@ -72,7 +44,7 @@ Options:
 
 Flash an image to a device:
 ```bash
-bl-cli flash -i <interface> -p <image-path> -a <address> [options]
+python3 BL_CLI flash -i <interface> -p <image-path> -a <address> [options]
 ```
 
 Options:
@@ -88,36 +60,15 @@ Options:
 
 1. Create an encrypted image:
 ```bash
-bl-cli image -i firmware.hex -o firmware.bin -k 000102030405060708090a0b0c0d0e0f -iv 000102030405060708090a0b0c0d0e0f -v
+python3 BL_CLI image -i firmware.hex -o firmware.bin -k 000102030405060708090a0b0c0d0e0f -iv 000102030405060708090a0b0c0d0e0f -v
 ```
 
 2. Flash via USB:
 ```bash
-bl-cli flash -i usb -p firmware.hex -a 0x08000000 -pid 0x0483 -vid 0x5740 -v
+python3 BL_CLI flash -i usb -p firmware.hex -a 0x08000000 -pid 0x0483 -vid 0x5740 -v
 ```
 
 3. Flash via UART:
 ```bash
-bl-cli flash -i uart -p firmware.hex -a 0x08000000 -P /dev/ttyUSB0 -v
+python3 BL_CLI flash -i uart -p firmware.hex -a 0x08000000 -P /dev/ttyUSB0 -v
 ```
-
-## Dependencies
-
-- click
-- pycryptodome
-- pyusb
-- pyserial
-- cryptography
-
-## Development
-
-For development, you can install the package in editable mode:
-```bash
-pip install -e .
-```
-
-This allows you to modify the code and test changes without reinstalling.
-
-## License
-
-This project is licensed under the MIT License. 
